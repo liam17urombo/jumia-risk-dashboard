@@ -11,13 +11,16 @@ st.markdown("An interactive dashboard to analyze seller risks, classification re
 # === Load data ===
 df_model = pd.read_csv('phase3_model_summary.csv')
 df_suspicious = pd.read_csv('sellers_to_suspend.csv')
+
 df_risk = pd.read_csv('seller_risk_table.csv')
+# Clean column names for consistency
+df_risk.rename(columns=lambda x: x.strip().lower().replace(" ", "_"), inplace=True)
 
 # === Summary Metrics ===
 st.header("📊 Summary Metrics")
 col1, col2, col3 = st.columns(3)
 col1.metric("Total Sellers", len(df_risk))
-col2.metric("High-Risk Sellers", len(df_risk[df_risk['risk_score'] > 0.8]))
+col2.metric("High-Risk Sellers", len(df_risk[df_risk['avg_predicted_return_risk'] > 0.8]))
 if 'predicted_probability' in df_model.columns:
     col3.metric("Avg Predicted Probability", f"{df_model['predicted_probability'].mean():.2%}")
 else:
@@ -26,8 +29,8 @@ else:
 # === Risk Score Distribution ===
 st.header("📈 Seller Risk Score Distribution")
 fig, ax = plt.subplots()
-df_risk['risk_score'].hist(bins=20, color='salmon', edgecolor='black', ax=ax)
-ax.set_xlabel("Risk Score")
+df_risk['avg_predicted_return_risk'].hist(bins=20, color='salmon', edgecolor='black', ax=ax)
+ax.set_xlabel("Avg Predicted Return Risk")
 ax.set_ylabel("Number of Sellers")
 st.pyplot(fig)
 
@@ -38,10 +41,10 @@ st.table(df_suspicious)
 # === Full Seller Risk Table with Filter ===
 st.header("🧮 Full Seller Risk Table")
 min_score = st.slider("Filter by Minimum Risk Score", 0.0, 1.0, 0.5)
-filtered_risk = df_risk[df_risk['risk_score'] >= min_score]
+filtered_risk = df_risk[df_risk['avg_predicted_return_risk'] >= min_score]
 
 # Style risk score with color gradient
-styled_df = filtered_risk.style.background_gradient(cmap='OrRd', subset=['risk_score'])
+styled_df = filtered_risk.style.background_gradient(cmap='OrRd', subset=['avg_predicted_return_risk'])
 st.dataframe(styled_df, use_container_width=True)
 
 # === Seller Lookup ===
@@ -73,7 +76,8 @@ with st.expander("🧠 How Suspension Criteria Works"):
     
     - Return Rate > 15%
     - Complaint Rate > 10%
-    - Risk Score > 0.8
+    - Avg Predicted Return Risk > 0.8
 
     These thresholds help identify potentially fraudulent or poor-quality sellers.
     """)
+'''
