@@ -1,0 +1,4 @@
+Customer Trust Policy (3-Point):
+✔️ Verified Seller System: Only verified sellers with consistent delivery are prioritized.
+🚚 Express Track Guarantee: Customers receive partial refunds if express deliveries are delayed.
+🛡️ AI Fraud Detection: Our ML model actively detects fake reviews and high-risk sellers.
